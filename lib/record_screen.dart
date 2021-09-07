@@ -1,46 +1,43 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_sound_lite/flutter_sound.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-class RecordScreen extends StatefulWidget {
-  const RecordScreen({Key? key}) : super(key: key);
+final pathaudio = 'audio.aac';
 
-  @override
-  _RecordScreenState createState() => _RecordScreenState();
-}
+class RecordScreen {
+  FlutterSoundRecorder? audiorecord;
+  bool inirecord = false;
+  bool get isrecord => audiorecord!.isRecording;
+  Future init() async {
+    audiorecord = FlutterSoundRecorder();
+    final status = await Permission.microphone.request();
+    if (status != PermissionStatus.granted) {
+      throw RecordingPermissionException('allow micro phone');
+    }
+    await audiorecord!.openAudioSession();
+    inirecord = true;
+  }
 
-class _RecordScreenState extends State<RecordScreen> {
-  IconData play = Icons.play_arrow;
-  IconData pause = Icons.pause;
-  bool isnull = true;
-  FlutterSoundRecorder? flutterSoundRecorder;
-  final audiosave = 'audio.aac';
+  void dispose() {
+    audiorecord!.closeAudioSession();
+    audiorecord = null;
+    inirecord = false;
+  }
+
   Future record() async {
-    await flutterSoundRecorder!.startRecorder(toFile: audiosave);
-
-    setState(() {
-      isnull = false;
-    });
+    if (!inirecord) return;
+    await audiorecord!.startRecorder(toFile: pathaudio);
   }
 
   Future stop() async {
-    await flutterSoundRecorder!.startRecorder();
-    setState(() {
-      isnull = true;
-    });
+    if (!inirecord) return;
+    await audiorecord!.stopRecorder();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: ElevatedButton.icon(
-          icon: Icon(isnull == true ? play : pause),
-          onPressed: () {
-            isnull == true ? record() : stop();
-          },
-          label: Text("Start"),
-        ),
-      ),
-    );
+  Future togglerecord() async {
+    if (audiorecord!.isStopped) {
+      await record();
+    } else {
+      await stop();
+    }
   }
 }
