@@ -38,11 +38,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   FlutterSoundRecorder? _myRecorder;
   final audioPlayer = AssetsAudioPlayer();
-  String? filePath;
-  String dd = "max2";
+
   bool _play = false;
   var audio;
   bool _record = false;
+  String? filePath = '/sdcard/Download/audio.wav';
 
   @override
   void initState() {
@@ -51,7 +51,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void startIt() async {
-    filePath = '/sdcard/Download/$dd.wav';
     _myRecorder = FlutterSoundRecorder();
 
     await _myRecorder!.openAudioSession(
@@ -69,17 +68,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          widget.title!,
-          style: TextStyle(color: Colors.red),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -151,31 +139,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-    );
-  }
-
-  ElevatedButton buildElevatedButton(
-      {IconData? icon, Color? iconColor, Function()? f}) {
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        padding: EdgeInsets.all(5.0),
-        side: BorderSide(
-          color: Colors.orange,
-          width: 3.0,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        primary: Colors.white,
-        elevation: 10.0,
-      ),
-      onPressed: f,
-      icon: Icon(
-        icon,
-        color: iconColor,
-        size: 35.0,
-      ),
-      label: Text(''),
     );
   }
 
