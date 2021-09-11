@@ -97,6 +97,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    double h = MediaQuery.of(context).size.height;
+    double w = MediaQuery.of(context).size.width;
     return Scaffold(
       floatingActionButton: FloatingActionButton(onPressed: () {
         delete();
@@ -105,68 +107,56 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                elevation: 10.0,
-              ),
-              onPressed: () {
+            GestureDetector(
+              onLongPress: () {
                 setState(() {
                   _record = !_record;
                 });
-                if (_record) record();
-                if (!_record) stopRecord();
+                record();
               },
-              icon: _record
-                  ? Icon(
-                      Icons.stop,
-                    )
-                  : Icon(Icons.mic),
-              label: _record
-                  ? Text(
-                      "Stop",
-                      style: TextStyle(
-                        fontSize: 25,
-                      ),
-                    )
-                  : Text(
-                      "Start",
-                      style: TextStyle(
-                        fontSize: 25,
-                      ),
-                    ),
+              onLongPressUp: () {
+                setState(() {
+                  _record = !_record;
+                });
+                stopRecord();
+              },
+              child: Container(
+                  height: h / 15,
+                  width: w / 8,
+                  decoration: BoxDecoration(
+                      color: Colors.amber,
+                      borderRadius: BorderRadius.circular(40.0)),
+                  child: IconButton(
+                    onPressed: () {},
+                    icon:
+                        _record == false ? Icon(Icons.mic) : Icon(Icons.pause),
+                  )),
             ),
             SizedBox(
               height: 20,
             ),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                elevation: 10.0,
+            Container(
+              height: h / 15,
+              width: w / 8,
+              decoration: BoxDecoration(
+                  color: Colors.amber,
+                  borderRadius: BorderRadius.circular(40.0)),
+              child: IconButton(
+                onPressed: () {
+                  setState(() {
+                    _play = !_play;
+                  });
+                  if (_play) {
+                    startPlaying();
+                  }
+
+                  if (!_play) {
+                    stopPlaying();
+                  }
+                },
+                icon:
+                    _play == false ? Icon(Icons.play_arrow) : Icon(Icons.pause),
               ),
-              onPressed: () {
-                setState(() {
-                  _play = !_play;
-                });
-                if (_play) startPlaying();
-                if (!_play) stopPlaying();
-              },
-              icon: _play
-                  ? Icon(
-                      Icons.stop,
-                    )
-                  : Icon(Icons.play_arrow),
-              label: _play
-                  ? Text(
-                      "Stop",
-                      style: TextStyle(
-                        fontSize: 25,
-                      ),
-                    )
-                  : Text(
-                      " Play",
-                      style: TextStyle(
-                        fontSize: 25,
-                      ),
-                    ),
             ),
             TextField(
               decoration: InputDecoration(
