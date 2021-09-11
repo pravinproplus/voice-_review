@@ -4,9 +4,9 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
-
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path/path.dart' as path;
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(MyApp());
@@ -40,9 +40,10 @@ class _MyHomePageState extends State<MyHomePage> {
   final audioPlayer = AssetsAudioPlayer();
 
   bool _play = false;
-  var audio;
+  File? file;
   bool _record = false;
-  String? filePath = '/sdcard/Download/audio.wav';
+  String? filePath = '/storage/emulated/0/Download/audio.wav';
+  TextEditingController cmnt = TextEditingController();
 
   @override
   void initState() {
@@ -50,6 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
     startIt();
   }
 
+//audio session and get permission method
   void startIt() async {
     _myRecorder = FlutterSoundRecorder();
 
@@ -59,15 +61,46 @@ class _MyHomePageState extends State<MyHomePage> {
         mode: SessionMode.modeDefault,
         device: AudioDevice.speaker);
     await _myRecorder!.setSubscriptionDuration(Duration(milliseconds: 10));
-
     await Permission.microphone.request();
     await Permission.storage.request();
     await Permission.manageExternalStorage.request();
   }
 
+//file upload methd
+  Future addnetwork(String cmt) async {
+    try {
+      file = File(filePath!);
+      Map data = {
+        'file': file,
+        'comment': cmt,
+      };
+
+      print(file);
+      http.Response response =
+          await http.post(Uri.parse('Url link'), //Your Url link
+              body: data);
+      var jsondata = response.body;
+      print('success');
+      print(jsondata);
+      delete();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+//file delete method
+  void delete() {
+    final dir = Directory(filePath!);
+    dir.deleteSync(recursive: true);
+    print('successfully deleted');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(onPressed: () {
+        delete();
+      }),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -135,7 +168,23 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
             ),
-            Text(audio.toString()),
+            TextField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Enter your comment',
+              ),
+              controller: cmnt,
+            ),
+            Container(
+              width: double.maxFinite,
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: ElevatedButton.icon(
+                    onPressed: () => addnetwork(cmnt.text),
+                    icon: Icon(Icons.upload),
+                    label: Text('upload')),
+              ),
+            )
           ],
         ),
       ),
@@ -165,9 +214,6 @@ class _MyHomePageState extends State<MyHomePage> {
       autoStart: true,
       showNotification: true,
     );
-    setState(() {
-      audio = Audio(filePath!);
-    });
   }
 
   Future<void> stopPlaying() async {
