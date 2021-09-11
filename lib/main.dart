@@ -158,6 +158,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     _play == false ? Icon(Icons.play_arrow) : Icon(Icons.pause),
               ),
             ),
+            SizedBox(
+              height: 20,
+            ),
             TextField(
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
