@@ -41,7 +41,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool _play = false;
   File? file;
+  Duration? duration = Duration();
+  Duration? position = Duration();
   bool _record = false;
+
   String? filePath = '/storage/emulated/0/Download/audio.wav';
   TextEditingController cmnt = TextEditingController();
 
@@ -95,6 +98,49 @@ class _MyHomePageState extends State<MyHomePage> {
     print('successfully deleted');
   }
 
+//audio record method
+  Future<void> record() async {
+    Directory dir = Directory(path.dirname(filePath!));
+    if (!dir.existsSync()) {
+      dir.createSync();
+    }
+    _myRecorder!.openAudioSession();
+    await _myRecorder!.startRecorder(
+      toFile: filePath,
+      codec: Codec.pcm16WAV,
+    );
+  }
+
+//stop record method
+  Future stopRecord() async {
+    _myRecorder!.closeAudioSession();
+    return await _myRecorder!.stopRecorder();
+  }
+
+//audio play method
+  Future<void> startPlaying() async {
+    audioPlayer.open(
+      Audio.file(filePath!),
+      autoStart: true,
+      showNotification: true,
+    );
+    audioPlayer.current;
+
+    audioPlayer.currentPosition.listen((event) {
+      setState(() {
+        position = event;
+       
+        print(position);
+      });
+    });
+  }
+
+//stop playing method
+  Future<void> stopPlaying() async {
+    audioPlayer.stop();
+  }
+  //inside a stateful widget
+
   @override
   Widget build(BuildContext context) {
     double h = MediaQuery.of(context).size.height;
@@ -107,6 +153,50 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Container(
+              height: h / 12,
+              width: w / 1.2,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(3.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: h / 15,
+                        width: w / 8,
+                        child: IconButton(
+                          iconSize: 30.0,
+                          onPressed: () {
+                            setState(() {
+                              _play = !_play;
+                            });
+                            if (_play) {
+                              startPlaying();
+                            }
+
+                            if (!_play) {
+                              stopPlaying();
+                            }
+                          },
+                          icon: _play == false
+                              ? Icon(Icons.play_arrow)
+                              : Icon(Icons.pause),
+                        ),
+                      ),
+                      Slider.adaptive(
+                          min: 00.0,
+                          max: duration!.inSeconds.toDouble(),
+                          value: position!.inSeconds.toDouble(),
+                          onChanged: (double value) {
+                            setState(() {
+                              value = position!.inSeconds.toDouble();
+                            });
+                          })
+                    ],
+                  ),
+                ),
+              ),
+            ),
             GestureDetector(
               onLongPress: () {
                 setState(() {
@@ -121,41 +211,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 stopRecord();
               },
               child: Container(
-                  height: h / 15,
-                  width: w / 8,
-                  decoration: BoxDecoration(
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(40.0)),
-                  child: IconButton(
-                    onPressed: () {},
-                    icon:
-                        _record == false ? Icon(Icons.mic) : Icon(Icons.pause),
-                  )),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Container(
-              height: h / 15,
-              width: w / 8,
-              decoration: BoxDecoration(
-                  color: Colors.amber,
-                  borderRadius: BorderRadius.circular(40.0)),
-              child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    _play = !_play;
-                  });
-                  if (_play) {
-                    startPlaying();
-                  }
-
-                  if (!_play) {
-                    stopPlaying();
-                  }
-                },
-                icon:
-                    _play == false ? Icon(Icons.play_arrow) : Icon(Icons.pause),
+                height: h / 15,
+                width: w / 8,
+                decoration: BoxDecoration(
+                    color: Colors.amber,
+                    borderRadius: BorderRadius.circular(4)),
+                child: _record == false ? Icon(Icons.mic) : Icon(Icons.pause),
               ),
             ),
             SizedBox(
@@ -177,39 +238,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     icon: Icon(Icons.upload),
                     label: Text('upload')),
               ),
-            )
+            ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> record() async {
-    Directory dir = Directory(path.dirname(filePath!));
-    if (!dir.existsSync()) {
-      dir.createSync();
-    }
-    _myRecorder!.openAudioSession();
-    await _myRecorder!.startRecorder(
-      toFile: filePath,
-      codec: Codec.pcm16WAV,
-    );
-  }
-
-  Future stopRecord() async {
-    _myRecorder!.closeAudioSession();
-    return await _myRecorder!.stopRecorder();
-  }
-
-  Future<void> startPlaying() async {
-    audioPlayer.open(
-      Audio.file(filePath!),
-      autoStart: true,
-      showNotification: true,
-    );
-  }
-
-  Future<void> stopPlaying() async {
-    audioPlayer.stop();
   }
 }
