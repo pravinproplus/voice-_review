@@ -198,7 +198,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           onChanged: (double value) {
                             setState(() {
                               value = position!.inSeconds.toDouble();
-                              _play = !_play;
                             });
                           })
                     ],
