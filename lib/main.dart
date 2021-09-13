@@ -152,9 +152,11 @@ class _MyHomePageState extends State<MyHomePage> {
     double h = MediaQuery.of(context).size.height;
     double w = MediaQuery.of(context).size.width;
     return Scaffold(
-      floatingActionButton: FloatingActionButton(onPressed: () {
-        delete();
-      }),
+      floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.delete),
+          onPressed: () {
+            delete();
+          }),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -196,6 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onChanged: (double value) {
                             setState(() {
                               value = position!.inSeconds.toDouble();
+                              _play = !_play;
                             });
                           })
                     ],
