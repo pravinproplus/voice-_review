@@ -125,11 +125,17 @@ class _MyHomePageState extends State<MyHomePage> {
       showNotification: true,
     );
     audioPlayer.current;
-
+    audioPlayer.current.listen((playingAudio) {
+      final songDuration = playingAudio!.audio.duration;
+      print("Here you have a duration $songDuration");
+      setState(() {
+        duration = songDuration;
+      });
+    });
     audioPlayer.currentPosition.listen((event) {
       setState(() {
         position = event;
-       
+
         print(position);
       });
     });
