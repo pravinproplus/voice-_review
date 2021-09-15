@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path/path.dart' as path;
-import 'package:http/http.dart' as http;
+import 'package:voice_review/network/network_helper.dart';
 
 void main() {
   runApp(MyApp());
@@ -44,7 +44,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Duration? duration = Duration();
   Duration? position = Duration();
   bool _record = false;
-
   String? filePath = '/storage/emulated/0/Download/audio.wav';
   TextEditingController cmnt = TextEditingController();
 
@@ -73,18 +72,12 @@ class _MyHomePageState extends State<MyHomePage> {
   Future addnetwork(String cmt) async {
     try {
       file = File(filePath!);
-      Map data = {
+      Map? data = {
         'file': file,
         'comment': cmt,
       };
-
-      print(file);
-      http.Response response =
-          await http.post(Uri.parse('Url link'), //Your Url link
-              body: data);
-      var jsondata = response.body;
-      print('success');
-      print(jsondata);
+      NetworkHelper networkHelper = NetworkHelper(url: '');
+      await networkHelper.network(data);
       delete();
     } catch (e) {
       print(e);
